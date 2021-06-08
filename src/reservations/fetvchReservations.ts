@@ -1,7 +1,5 @@
-import { badRequest, internal, notAcceptable, notFound } from "@hapi/boom";
-import { ResponseToolkit, RouteOptionsValidate, Request } from "@hapi/hapi";
-import Joi from "joi";
-import { mailTo } from "../function/mail";
+import { internal, notAcceptable, notFound } from "@hapi/boom";
+import { ResponseToolkit, Request } from "@hapi/hapi";
 import { ValidateUser } from "../middlewares";
 import { userModel } from "../user";
 import { ReservationModel } from ".";
