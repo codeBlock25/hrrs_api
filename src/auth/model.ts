@@ -15,6 +15,7 @@ export interface UserType extends Document {
   phone_number: string;
   verificationCode: string;
   isVerified: boolean;
+  date: Date;
 }
 
 const userSchema = new Schema({
@@ -61,6 +62,11 @@ const userSchema = new Schema({
     type: Boolean,
     required: true,
     default: false,
+  },
+  date: {
+    type: Date,
+    required: true,
+    default: new Date(),
   },
 });
 

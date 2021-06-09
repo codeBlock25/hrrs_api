@@ -1,50 +1,65 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.userModel = exports.Gender = void 0;
+exports.studentModel = void 0;
 var mongoose_1 = require("mongoose");
-var Gender;
-(function (Gender) {
-    Gender[Gender["male"] = 0] = "male";
-    Gender[Gender["female"] = 1] = "female";
-})(Gender = exports.Gender || (exports.Gender = {}));
-var userSchema = new mongoose_1.Schema({
-    first_name: {
-        type: String,
-        required: true,
-        lowercase: true,
+var studentSchema = new mongoose_1.Schema({
+    dateOfBirth: {
+        type: Date,
     },
-    last_name: {
-        type: String,
+    userID: {
+        type: mongoose_1.Schema.Types.ObjectId,
         required: true,
-        lowercase: true,
-    },
-    email: {
-        type: String,
-        required: true,
-        lowercase: true,
         unique: true,
     },
-    verificationCode: {
+    yearOfStudy: {
         type: String,
+        default: "",
         required: true,
     },
-    password: {
+    department: {
         type: String,
+        default: "",
         required: true,
     },
-    gender: {
-        type: Gender,
-        required: true,
-        default: Gender.male,
-    },
-    registrationNumber: {
+    nationality: {
         type: String,
+        default: "",
         required: true,
     },
-    phone_number: {
+    state: {
         type: String,
+        default: "",
         required: true,
-        unique: true,
+    },
+    lga: {
+        type: String,
+        default: "",
+        required: true,
+    },
+    address: {
+        type: String,
+        default: "",
+        required: true,
+    },
+    guardian_firstName: {
+        type: String,
+        default: "",
+        required: true,
+    },
+    guardian_lastName: {
+        type: String,
+        default: "",
+        required: true,
+    },
+    guardian_relationship: {
+        type: String,
+        default: "",
+        required: true,
+    },
+    guardian_phoneNumber: {
+        type: String,
+        default: "",
+        required: true,
     },
 });
-exports.userModel = mongoose_1.model("user", userSchema);
+exports.studentModel = mongoose_1.model("student", studentSchema);

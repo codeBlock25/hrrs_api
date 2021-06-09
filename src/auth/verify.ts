@@ -3,6 +3,7 @@ import { ResponseToolkit, RouteOptionsValidate, Request } from "@hapi/hapi";
 import Joi from "joi";
 import { sign } from "jsonwebtoken";
 import config from "../config";
+import { studentModel } from "../user/model";
 import { userModel } from "./model";
 
 export interface userVerificationRequestType {
@@ -41,6 +42,8 @@ export const userVerificationHandler = async (
       },
       { isVerified: true }
     );
+
+    await new studentModel({ userID: user._id }).save();
     let token = sign({ id: user._id }, config.secret, { expiresIn: "30 day" });
     return h.response({
       token,

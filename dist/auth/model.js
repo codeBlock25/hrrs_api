@@ -52,5 +52,10 @@ var userSchema = new mongoose_1.Schema({
         required: true,
         default: false,
     },
+    date: {
+        type: Date,
+        required: true,
+        default: new Date(),
+    },
 });
 exports.userModel = mongoose_1.model("user", userSchema);

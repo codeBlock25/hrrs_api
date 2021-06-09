@@ -35,62 +35,36 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.userVerificationHandler = exports.userVerificationValidator = void 0;
 var boom_1 = require("@hapi/boom");
-var joi_1 = __importDefault(require("joi"));
-var jsonwebtoken_1 = require("jsonwebtoken");
-var config_1 = __importDefault(require("../config"));
-var model_1 = require("../user/model");
-var model_2 = require("./model");
-exports.userVerificationValidator = {
-    payload: joi_1.default.object({
-        registrationNumber: joi_1.default.string().required(),
-        verificationCode: joi_1.default.string().required(),
-    }),
-    failAction: function (_r, _h, err) {
-        return boom_1.badRequest("Unsupported format, Error " + err);
-    },
-};
-var userVerificationHandler = function (req, h) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, registrationNumber, verificationCode, user, token, error_1;
-    return __generator(this, function (_b) {
-        switch (_b.label) {
+var middlewares_1 = require("../middlewares");
+var model_1 = require("./model");
+var userDetailsHandler = function (req, h) { return __awaiter(void 0, void 0, void 0, function () {
+    var auth, userDetails, error_1;
+    var _a, _b;
+    return __generator(this, function (_c) {
+        switch (_c.label) {
             case 0:
-                _b.trys.push([0, 4, , 5]);
-                _a = req.payload, registrationNumber = _a.registrationNumber, verificationCode = _a.verificationCode;
-                return [4, model_2.userModel.findOne({
-                        verificationCode: verificationCode.trim(),
-                        registrationNumber: registrationNumber,
-                    })];
+                _c.trys.push([0, 3, , 4]);
+                return [4, middlewares_1.ValidateUser(req)];
             case 1:
-                user = _b.sent();
-                if (!user) {
-                    return [2, boom_1.notFound("Student account not found.")];
+                auth = _c.sent();
+                if (!auth.isValid) {
+                    return [2, boom_1.badGateway("Failed Credential with Error: " + ((_a = auth.reason) !== null && _a !== void 0 ? _a : "JWT"))];
                 }
-                return [4, model_2.userModel.updateOne({
-                        registrationNumber: registrationNumber,
-                    }, { isVerified: true })];
+                return [4, model_1.studentModel
+                        .findOne({ userID: (_b = auth.credentials) !== null && _b !== void 0 ? _b : "" })
+                        .populate("user")];
             case 2:
-                _b.sent();
-                return [4, new model_1.studentModel({ userID: user._id }).save()];
+                userDetails = _c.sent();
+                if (!userDetails) {
+                    return [2, boom_1.notFound("student not found")];
+                }
+                return [2, h.response({ details: userDetails })];
             case 3:
-                _b.sent();
-                token = jsonwebtoken_1.sign({ id: user._id }, config_1.default.secret, { expiresIn: "30 day" });
-                return [2, h.response({
-                        token: token,
-                        message: user.isVerified
-                            ? "Your account is already verified, you can proceed to use."
-                            : "Your has been created successfully!.",
-                    })];
-            case 4:
-                error_1 = _b.sent();
+                error_1 = _c.sent();
                 return [2, boom_1.internal(JSON.stringify(error_1))];
-            case 5: return [2];
+            case 4: return [2];
         }
     });
 }); };
-exports.userVerificationHandler = userVerificationHandler;

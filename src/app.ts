@@ -9,7 +9,11 @@ const init = async () => {
     port: config.port,
     routes: {
       cors: {
-        origin: ["https://www.dipromedics.com", "https://dipromedics.com"],
+        origin: [
+          "https://www.dipromedics.com",
+          "https://dipromedics.com",
+          "http://localhost:1010",
+        ],
       },
     },
   });
