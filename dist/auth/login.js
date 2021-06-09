@@ -35,41 +35,52 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.reservationRequestHandler = void 0;
+exports.userLoginHandler = exports.userLoginValidator = void 0;
 var boom_1 = require("@hapi/boom");
-var middlewares_1 = require("../middlewares");
-var auth_1 = require("../auth");
-var _1 = require(".");
-var reservationRequestHandler = function (req, h) { return __awaiter(void 0, void 0, void 0, function () {
-    var validateAuth, user, reservations, error_1;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
+var bcryptjs_1 = require("bcryptjs");
+var joi_1 = __importDefault(require("joi"));
+var jsonwebtoken_1 = require("jsonwebtoken");
+var model_1 = require("./model");
+var config_1 = __importDefault(require("../config"));
+exports.userLoginValidator = {
+    query: joi_1.default.object({
+        registrationNumber: joi_1.default.string().required(),
+        password: joi_1.default.string().required(),
+    }),
+    failAction: function (_r, _h, err) {
+        return boom_1.badRequest("Unsupported format, Error: " + err);
+    },
+};
+var userLoginHandler = function (req, h) { return __awaiter(void 0, void 0, void 0, function () {
+    var _a, registrationNumber, password, user, passwordConfirmed, token, error_1;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
             case 0:
-                _a.trys.push([0, 4, , 5]);
-                return [4, middlewares_1.ValidateUser(req)];
-            case 1:
-                validateAuth = _a.sent();
-                if (!validateAuth.isValid) {
-                    return [2, boom_1.notAcceptable(validateAuth.reason)];
-                }
-                return [4, auth_1.userModel.findById(validateAuth.credentials)];
-            case 2:
-                user = _a.sent();
-                if (!user) {
-                    return [2, boom_1.notFound("Student not found.")];
-                }
-                return [4, _1.ReservationModel.find({ userID: user._id })];
-            case 3:
-                reservations = _a.sent();
-                return [2, h.response({
-                        reservations: reservations,
+                _b.trys.push([0, 2, , 3]);
+                _a = req.query, registrationNumber = _a.registrationNumber, password = _a.password;
+                return [4, model_1.userModel.findOne({
+                        registrationNumber: registrationNumber.trim(),
                     })];
-            case 4:
-                error_1 = _a.sent();
+            case 1:
+                user = _b.sent();
+                if (!user) {
+                    return [2, boom_1.notFound("Student account not found.")];
+                }
+                passwordConfirmed = bcryptjs_1.compareSync(password, user.password);
+                if (!passwordConfirmed) {
+                    return [2, boom_1.notAcceptable("incorrect password.")];
+                }
+                token = jsonwebtoken_1.sign({ id: user._id }, config_1.default.secret, { expiresIn: "30 day" });
+                return [2, h.response({ token: token })];
+            case 2:
+                error_1 = _b.sent();
                 return [2, boom_1.internal(JSON.stringify(error_1))];
-            case 5: return [2];
+            case 3: return [2];
         }
     });
 }); };
-exports.reservationRequestHandler = reservationRequestHandler;
+exports.userLoginHandler = userLoginHandler;

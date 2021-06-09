@@ -35,41 +35,65 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.reservationRequestHandler = void 0;
+exports.userRegistrationHandler = exports.userRegistrationValidator = void 0;
 var boom_1 = require("@hapi/boom");
-var middlewares_1 = require("../middlewares");
-var auth_1 = require("../auth");
-var _1 = require(".");
-var reservationRequestHandler = function (req, h) { return __awaiter(void 0, void 0, void 0, function () {
-    var validateAuth, user, reservations, error_1;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
+var joi_1 = __importDefault(require("joi"));
+var model_1 = require("./model");
+var randomstring_1 = require("randomstring");
+var mail_1 = require("../function/mail");
+var bcryptjs_1 = require("bcryptjs");
+exports.userRegistrationValidator = {
+    payload: joi_1.default.object({
+        first_name: joi_1.default.string().required(),
+        last_name: joi_1.default.string().required(),
+        email: joi_1.default.string().email().required(),
+        password: joi_1.default.string().required(),
+        gender: joi_1.default.number().min(0).max(1).required(),
+        registrationNumber: joi_1.default.string().required(),
+        phone_number: joi_1.default.string().required(),
+    }),
+    failAction: function (_r, _h, err) {
+        return boom_1.badRequest("Unsupported format, Error: " + err);
+    },
+};
+var userRegistrationHandler = function (req, h) { return __awaiter(void 0, void 0, void 0, function () {
+    var _a, first_name, last_name, email, password, gender, registrationNumber, phone_number, code, hashedPassword, error_1;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
             case 0:
-                _a.trys.push([0, 4, , 5]);
-                return [4, middlewares_1.ValidateUser(req)];
+                _b.trys.push([0, 2, , 3]);
+                _a = req.payload, first_name = _a.first_name, last_name = _a.last_name, email = _a.email, password = _a.password, gender = _a.gender, registrationNumber = _a.registrationNumber, phone_number = _a.phone_number;
+                code = randomstring_1.generate({ length: 6, charset: "numeric" });
+                hashedPassword = bcryptjs_1.hashSync(password, bcryptjs_1.genSaltSync(4));
+                return [4, new model_1.userModel({
+                        first_name: first_name,
+                        last_name: last_name,
+                        email: email,
+                        password: hashedPassword,
+                        gender: gender,
+                        registrationNumber: registrationNumber,
+                        phone_number: phone_number,
+                        verificationCode: code,
+                    }).save()];
             case 1:
-                validateAuth = _a.sent();
-                if (!validateAuth.isValid) {
-                    return [2, boom_1.notAcceptable(validateAuth.reason)];
-                }
-                return [4, auth_1.userModel.findById(validateAuth.credentials)];
-            case 2:
-                user = _a.sent();
-                if (!user) {
-                    return [2, boom_1.notFound("Student not found.")];
-                }
-                return [4, _1.ReservationModel.find({ userID: user._id })];
-            case 3:
-                reservations = _a.sent();
+                _b.sent();
+                mail_1.mailTo({
+                    subject: "Verify your account",
+                    mail: email,
+                    msg: "Your verification code is <b>" + code + "</b>",
+                });
                 return [2, h.response({
-                        reservations: reservations,
+                        message: "verification code has been sent successfully and account created.",
                     })];
-            case 4:
-                error_1 = _a.sent();
+            case 2:
+                error_1 = _b.sent();
                 return [2, boom_1.internal(JSON.stringify(error_1))];
-            case 5: return [2];
+            case 3: return [2];
         }
     });
 }); };
-exports.reservationRequestHandler = reservationRequestHandler;
+exports.userRegistrationHandler = userRegistrationHandler;

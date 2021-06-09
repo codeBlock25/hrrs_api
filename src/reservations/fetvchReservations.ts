@@ -1,7 +1,7 @@
 import { internal, notAcceptable, notFound } from "@hapi/boom";
 import { ResponseToolkit, Request } from "@hapi/hapi";
 import { ValidateUser } from "../middlewares";
-import { userModel } from "../user";
+import { userModel } from "../auth";
 import { ReservationModel } from ".";
 
 export const reservationRequestHandler = async (

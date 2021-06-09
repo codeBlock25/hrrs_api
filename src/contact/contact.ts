@@ -3,7 +3,7 @@ import { Request, ResponseToolkit, RouteOptionsValidate } from "@hapi/hapi";
 import Joi from "joi";
 import { mailTo } from "../function/mail";
 import { ValidateUser } from "../middlewares";
-import { userModel } from "../user";
+import { userModel } from "../auth";
 
 export interface contactRequestType {
   first_name: string;

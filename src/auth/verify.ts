@@ -11,7 +11,7 @@ export interface userVerificationRequestType {
 }
 
 export const userVerificationValidator: RouteOptionsValidate = {
-  query: Joi.object({
+  payload: Joi.object({
     registrationNumber: Joi.string().required(),
     verificationCode: Joi.string().required(),
   }),
@@ -26,7 +26,7 @@ export const userVerificationHandler = async (
 ) => {
   try {
     const { registrationNumber, verificationCode } =
-      req.query as userVerificationRequestType;
+      req.payload as userVerificationRequestType;
     let user = await userModel.findOne({
       verificationCode: verificationCode.trim(),
       registrationNumber: registrationNumber,
@@ -35,8 +35,19 @@ export const userVerificationHandler = async (
     if (!user) {
       return notFound("Student account not found.");
     }
+    await userModel.updateOne(
+      {
+        registrationNumber: registrationNumber,
+      },
+      { isVerified: true }
+    );
     let token = sign({ id: user._id }, config.secret, { expiresIn: "30 day" });
-    return h.response({ token });
+    return h.response({
+      token,
+      message: user.isVerified
+        ? "Your account is already verified, you can proceed to use."
+        : "Your has been created successfully!.",
+    });
   } catch (error) {
     return internal(JSON.stringify(error));
   }

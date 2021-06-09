@@ -3,7 +3,7 @@ import { ResponseToolkit, RouteOptionsValidate, Request } from "@hapi/hapi";
 import Joi from "joi";
 import { mailTo } from "../function/mail";
 import { ValidateUser } from "../middlewares";
-import { userModel } from "../user";
+import { userModel } from "../auth";
 import { ReservationModel, ReservationType } from "./";
 
 export const reservationRequestValidator: RouteOptionsValidate = {

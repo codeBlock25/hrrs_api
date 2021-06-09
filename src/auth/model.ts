@@ -14,6 +14,7 @@ export interface UserType extends Document {
   registrationNumber: string;
   phone_number: string;
   verificationCode: string;
+  isVerified: boolean;
 }
 
 const userSchema = new Schema({
@@ -49,11 +50,17 @@ const userSchema = new Schema({
   registrationNumber: {
     type: String,
     required: true,
+    unique: true,
   },
   phone_number: {
     type: String,
     required: true,
     unique: true,
+  },
+  isVerified: {
+    type: Boolean,
+    required: true,
+    default: false,
   },
 });
 

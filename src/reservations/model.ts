@@ -1,5 +1,5 @@
 import { Schema, Document, model } from "mongoose";
-import { UserType } from "../user";
+import { UserType } from "../auth";
 
 export enum BedSpaceType {
   secA,

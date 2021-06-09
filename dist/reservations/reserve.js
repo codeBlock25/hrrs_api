@@ -44,7 +44,7 @@ var boom_1 = require("@hapi/boom");
 var joi_1 = __importDefault(require("joi"));
 var mail_1 = require("../function/mail");
 var middlewares_1 = require("../middlewares");
-var user_1 = require("../user");
+var auth_1 = require("../auth");
 var _1 = require("./");
 exports.reservationRequestValidator = {
     payload: joi_1.default.object({
@@ -70,7 +70,7 @@ var reservationRequestHandler = function (req, h) { return __awaiter(void 0, voi
                 if (!validateAuth.isValid) {
                     return [2, boom_1.notAcceptable(validateAuth.reason)];
                 }
-                return [4, user_1.userModel.findById(validateAuth.credentials)];
+                return [4, auth_1.userModel.findById(validateAuth.credentials)];
             case 2:
                 user = _b.sent();
                 if (!user) {
