@@ -53,7 +53,7 @@ var init = function () { return __awaiter(void 0, void 0, void 0, function () {
                     port: config_1.default.port,
                     routes: {
                         cors: {
-                            origin: ["*", "https://www.dipromedics.com", "https://dipromedics.com"],
+                            origin: ["https://www.dipromedics.com", "https://dipromedics.com"],
                         },
                     },
                 });
