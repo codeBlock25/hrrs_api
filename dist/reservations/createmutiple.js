@@ -502,7 +502,7 @@ var rooms = [
         ],
     },
 ];
-var createMultipleReservationsHandler = function (req, h) { return __awaiter(void 0, void 0, void 0, function () {
+var createMultipleReservationsHandler = function (_req, h) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         try {
             rooms.map(function (room) { return __awaiter(void 0, void 0, void 0, function () {

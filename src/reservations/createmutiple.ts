@@ -484,7 +484,7 @@ const rooms: {
 ];
 
 export const createMultipleReservationsHandler = async (
-  req: Request,
+  _req: Request,
   h: ResponseToolkit
 ) => {
   try {
