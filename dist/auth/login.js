@@ -46,6 +46,8 @@ var joi_1 = __importDefault(require("joi"));
 var jsonwebtoken_1 = require("jsonwebtoken");
 var model_1 = require("./model");
 var config_1 = __importDefault(require("../config"));
+var randomstring_1 = require("randomstring");
+var mail_1 = require("../function/mail");
 exports.userLoginValidator = {
     query: joi_1.default.object({
         registrationNumber: joi_1.default.string().required(),
@@ -56,11 +58,11 @@ exports.userLoginValidator = {
     },
 };
 var userLoginHandler = function (req, h) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, registrationNumber, password, user, passwordConfirmed, token, error_1;
+    var _a, registrationNumber, password, user, code, passwordConfirmed, token, error_1;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
-                _b.trys.push([0, 2, , 3]);
+                _b.trys.push([0, 4, , 5]);
                 _a = req.query, registrationNumber = _a.registrationNumber, password = _a.password;
                 return [4, model_1.userModel.findOne({
                         registrationNumber: registrationNumber.trim(),
@@ -70,16 +72,28 @@ var userLoginHandler = function (req, h) { return __awaiter(void 0, void 0, void
                 if (!user) {
                     return [2, boom_1.notFound("Student account not found.")];
                 }
+                if (!!user.isVerified) return [3, 3];
+                code = randomstring_1.generate({ length: 6, charset: "numeric" });
+                return [4, model_1.userModel.updateOne({ _id: user._id }, { verificationCode: code })];
+            case 2:
+                _b.sent();
+                mail_1.mailTo({
+                    subject: "Verify your account",
+                    mail: user.email,
+                    msg: "Your verification code is <b>" + code + "</b>",
+                });
+                return [2, boom_1.forbidden("User must verify their accounts.")];
+            case 3:
                 passwordConfirmed = bcryptjs_1.compareSync(password, user.password);
                 if (!passwordConfirmed) {
                     return [2, boom_1.notAcceptable("incorrect password.")];
                 }
                 token = jsonwebtoken_1.sign({ id: user._id }, config_1.default.secret, { expiresIn: "30 day" });
                 return [2, h.response({ token: token })];
-            case 2:
+            case 4:
                 error_1 = _b.sent();
                 return [2, boom_1.internal(JSON.stringify(error_1))];
-            case 3: return [2];
+            case 5: return [2];
         }
     });
 }); };

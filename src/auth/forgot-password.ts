@@ -24,6 +24,7 @@ export const forgotPasswordHandler = async (
     let code = generate({ length: 9 });
     let password = hashSync(code, genSaltSync(4));
     await userModel.updateOne({ email }, { password });
+
     mailTo({
       subject: "Account recovery",
       mail: email,

@@ -1,10 +1,18 @@
-import { badRequest, internal, notAcceptable, notFound } from "@hapi/boom";
+import {
+  badRequest,
+  internal,
+  notAcceptable,
+  notFound,
+  forbidden,
+} from "@hapi/boom";
 import { Request, ResponseToolkit, RouteOptionsValidate } from "@hapi/hapi";
 import { compareSync } from "bcryptjs";
 import Joi from "joi";
 import { sign } from "jsonwebtoken";
 import { userModel } from "./model";
 import config from "../config";
+import { generate } from "randomstring";
+import { mailTo } from "../function/mail";
 
 export interface userLoginType {
   registrationNumber: string;
@@ -29,6 +37,16 @@ export const userLoginHandler = async (req: Request, h: ResponseToolkit) => {
     });
     if (!user) {
       return notFound("Student account not found.");
+    }
+    if (!user.isVerified) {
+      let code = generate({ length: 6, charset: "numeric" });
+      await userModel.updateOne({ _id: user._id }, { verificationCode: code });
+      mailTo({
+        subject: "Verify your account",
+        mail: user.email,
+        msg: `Your verification code is <b>${code}</b>`,
+      });
+      return forbidden("User must verify their accounts.");
     }
     let passwordConfirmed = compareSync(password, user.password);
 

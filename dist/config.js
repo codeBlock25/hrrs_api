@@ -5,9 +5,7 @@ var APP_CONFIG = process.env;
 dotenv_1.config();
 var config = {
     get db() {
-        return (APP_CONFIG.DATABASE ||
-            "mongodb+srv://advancebankofasia:advancebankofasia2021@cluster0.qny3h.mongodb.net/hrrs?retryWrites=true&w=majority" ||
-            "mongodb://localhost:27017/hrrs");
+        return APP_CONFIG.DATABASE || "mongodb://localhost:27017/hrrs";
     },
     get port() {
         return APP_CONFIG.PORT || 4455;
