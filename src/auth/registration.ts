@@ -1,4 +1,4 @@
-import { badRequest, internal } from "@hapi/boom";
+import { badRequest, conflict, internal } from "@hapi/boom";
 import { ResponseToolkit, RouteOptionsValidate, Request } from "@hapi/hapi";
 import Joi from "joi";
 import { userModel, UserType } from "./model";
@@ -56,8 +56,16 @@ export const userRegistrationHandler = async (
       message:
         "verification code has been sent successfully and account created.",
     });
-  } catch (error) {
-    console.log(error);
+  } catch (error: any) {
+    if (error?.keyValue?.email) {
+      return conflict("A user with this email already exit.");
+    }
+    if (error?.keyValue?.registrationNumber) {
+      return conflict("A user with this registration number already exit.");
+    }
+    if (error?.keyValue?.phone_number) {
+      return conflict("A user with this phone number already exit.");
+    }
     return internal(JSON.stringify(error));
   }
 };

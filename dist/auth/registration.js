@@ -62,10 +62,11 @@ exports.userRegistrationValidator = {
 };
 var userRegistrationHandler = function (req, h) { return __awaiter(void 0, void 0, void 0, function () {
     var _a, first_name, last_name, email, password, gender, registrationNumber, phone_number, code, hashedPassword, error_1;
-    return __generator(this, function (_b) {
-        switch (_b.label) {
+    var _b, _c, _d;
+    return __generator(this, function (_e) {
+        switch (_e.label) {
             case 0:
-                _b.trys.push([0, 2, , 3]);
+                _e.trys.push([0, 2, , 3]);
                 _a = req.payload, first_name = _a.first_name, last_name = _a.last_name, email = _a.email, password = _a.password, gender = _a.gender, registrationNumber = _a.registrationNumber, phone_number = _a.phone_number;
                 code = randomstring_1.generate({ length: 6, charset: "numeric" });
                 hashedPassword = bcryptjs_1.hashSync(password, bcryptjs_1.genSaltSync(4));
@@ -80,7 +81,7 @@ var userRegistrationHandler = function (req, h) { return __awaiter(void 0, void 
                         verificationCode: code,
                     }).save()];
             case 1:
-                _b.sent();
+                _e.sent();
                 mail_1.mailTo({
                     subject: "Verify your account",
                     mail: email,
@@ -90,8 +91,16 @@ var userRegistrationHandler = function (req, h) { return __awaiter(void 0, void 
                         message: "verification code has been sent successfully and account created.",
                     })];
             case 2:
-                error_1 = _b.sent();
-                console.log(error_1);
+                error_1 = _e.sent();
+                if ((_b = error_1 === null || error_1 === void 0 ? void 0 : error_1.keyValue) === null || _b === void 0 ? void 0 : _b.email) {
+                    return [2, boom_1.conflict("A user with this email already exit.")];
+                }
+                if ((_c = error_1 === null || error_1 === void 0 ? void 0 : error_1.keyValue) === null || _c === void 0 ? void 0 : _c.registrationNumber) {
+                    return [2, boom_1.conflict("A user with this registration number already exit.")];
+                }
+                if ((_d = error_1 === null || error_1 === void 0 ? void 0 : error_1.keyValue) === null || _d === void 0 ? void 0 : _d.phone_number) {
+                    return [2, boom_1.conflict("A user with this phone number already exit.")];
+                }
                 return [2, boom_1.internal(JSON.stringify(error_1))];
             case 3: return [2];
         }
