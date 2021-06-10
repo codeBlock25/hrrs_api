@@ -20,6 +20,7 @@ import {
   reservationRequestHandler,
   reservationRequestValidator,
 } from "./reservations";
+import { createMultipleReservationsHandler } from "./reservations/createmutiple";
 import {
   changeEmailHandler,
   changeEmailRequestValidator,

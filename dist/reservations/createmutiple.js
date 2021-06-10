@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createReservationsHandler = void 0;
+exports.createMultipleReservationsHandler = void 0;
 var boom_1 = require("@hapi/boom");
 var model_1 = require("./model");
 var rooms = [
@@ -502,7 +502,7 @@ var rooms = [
         ],
     },
 ];
-var createReservationsHandler = function (req, h) { return __awaiter(void 0, void 0, void 0, function () {
+var createMultipleReservationsHandler = function (req, h) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         try {
             rooms.map(function (room) { return __awaiter(void 0, void 0, void 0, function () {
@@ -513,28 +513,28 @@ var createReservationsHandler = function (req, h) { return __awaiter(void 0, voi
                                     switch (_a.label) {
                                         case 0: return [4, _room.rooms.map(function (__room) { return __awaiter(void 0, void 0, void 0, function () {
                                                 return __generator(this, function (_a) {
-                                                    switch (_a.label) {
-                                                        case 0: return [4, [
-                                                                model_1.BedSpaceType.secA,
-                                                                model_1.BedSpaceType.secB,
-                                                                model_1.BedSpaceType.secC,
-                                                                model_1.BedSpaceType.secD,
-                                                            ].map(function (space) { return __awaiter(void 0, void 0, void 0, function () {
-                                                                return __generator(this, function (_a) {
-                                                                    new model_1.ReservationModel({
+                                                    [
+                                                        model_1.BedSpaceType.secA,
+                                                        model_1.BedSpaceType.secB,
+                                                        model_1.BedSpaceType.secC,
+                                                        model_1.BedSpaceType.secD,
+                                                    ].map(function (space) { return __awaiter(void 0, void 0, void 0, function () {
+                                                        return __generator(this, function (_a) {
+                                                            switch (_a.label) {
+                                                                case 0: return [4, new model_1.ReservationModel({
                                                                         hostel_name: room.hostel_name,
                                                                         floor: _room.name,
                                                                         room_name: "RM-" + __room,
                                                                         bed_space: space,
                                                                         date: new Date(),
-                                                                    }).save();
+                                                                    }).save()];
+                                                                case 1:
+                                                                    _a.sent();
                                                                     return [2];
-                                                                });
-                                                            }); })];
-                                                        case 1:
-                                                            _a.sent();
-                                                            return [2];
-                                                    }
+                                                            }
+                                                        });
+                                                    }); });
+                                                    return [2];
                                                 });
                                             }); })];
                                         case 1:
@@ -558,4 +558,4 @@ var createReservationsHandler = function (req, h) { return __awaiter(void 0, voi
         return [2];
     });
 }); };
-exports.createReservationsHandler = createReservationsHandler;
+exports.createMultipleReservationsHandler = createMultipleReservationsHandler;

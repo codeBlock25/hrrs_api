@@ -483,7 +483,7 @@ const rooms: {
   },
 ];
 
-export const createReservationsHandler = async (
+export const createMultipleReservationsHandler = async (
   req: Request,
   h: ResponseToolkit
 ) => {
@@ -491,20 +491,13 @@ export const createReservationsHandler = async (
     rooms.map(async (room) => {
       await room.allocations.map(async (_room) => {
         await _room.rooms.map(async (__room) => {
-          //   console.log({
-          //     hostel_name: room.hostel_name,
-          //     floor: _room.name,
-          //     room_name: __room,
-          //     bed_space: BedSpaceType.secA,
-          //     date: new Date(),
-          //   });
-          await [
+          [
             BedSpaceType.secA,
             BedSpaceType.secB,
             BedSpaceType.secC,
             BedSpaceType.secD,
           ].map(async (space) => {
-            new ReservationModel({
+            await new ReservationModel({
               hostel_name: room.hostel_name,
               floor: _room.name,
               room_name: `RM-${__room}`,
