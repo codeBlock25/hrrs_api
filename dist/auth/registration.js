@@ -91,6 +91,7 @@ var userRegistrationHandler = function (req, h) { return __awaiter(void 0, void 
                     })];
             case 2:
                 error_1 = _b.sent();
+                console.log(error_1);
                 return [2, boom_1.internal(JSON.stringify(error_1))];
             case 3: return [2];
         }

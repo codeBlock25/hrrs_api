@@ -57,6 +57,7 @@ export const userRegistrationHandler = async (
         "verification code has been sent successfully and account created.",
     });
   } catch (error) {
+    console.log(error);
     return internal(JSON.stringify(error));
   }
 };
