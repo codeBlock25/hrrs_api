@@ -36,71 +36,38 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.studentDetailsHandler = void 0;
+exports.getCurrentReservation = void 0;
 var boom_1 = require("@hapi/boom");
 var auth_1 = require("../auth");
 var middlewares_1 = require("../middlewares");
-var reservations_1 = require("../reservations");
 var model_1 = require("./model");
-var studentDetailsHandler = function (req, h) { return __awaiter(void 0, void 0, void 0, function () {
-    var auth, student, reservations, user, error_1;
-    var _a, _b, _c, _d;
-    return __generator(this, function (_e) {
-        switch (_e.label) {
+var getCurrentReservation = function (req, h) { return __awaiter(void 0, void 0, void 0, function () {
+    var validateAuth, user, reservations, error_1;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
             case 0:
-                _e.trys.push([0, 5, , 6]);
+                _a.trys.push([0, 4, , 5]);
                 return [4, middlewares_1.ValidateUser(req)];
             case 1:
-                auth = _e.sent();
-                if (!auth.isValid) {
-                    return [2, boom_1.badGateway("Failed Credential with Error: " + ((_a = auth.reason) !== null && _a !== void 0 ? _a : "JWT"))];
+                validateAuth = _a.sent();
+                if (!validateAuth.isValid) {
+                    return [2, boom_1.notAcceptable(validateAuth.reason)];
                 }
-                return [4, model_1.studentModel.findOne({
-                        userID: (_b = auth.credentials) !== null && _b !== void 0 ? _b : "",
-                    })];
+                return [4, auth_1.userModel.findById(validateAuth.credentials)];
             case 2:
-                student = _e.sent();
-                return [4, reservations_1.ReservationModel.find({
-                        userID: (_c = auth.credentials) !== null && _c !== void 0 ? _c : "",
-                    })];
-            case 3:
-                reservations = _e.sent();
-                return [4, auth_1.userModel.findOne({ _id: (_d = auth.credentials) !== null && _d !== void 0 ? _d : "" })];
-            case 4:
-                user = _e.sent();
-                if (!user || !student) {
-                    return [2, boom_1.notFound("student not found")];
+                user = _a.sent();
+                if (!user) {
+                    return [2, boom_1.notFound("Student not found.")];
                 }
-                return [2, h.response({
-                        details: {
-                            first_name: user.first_name,
-                            last_name: user.last_name,
-                            email: user.email,
-                            gender: user.gender,
-                            registrationNumber: user.registrationNumber,
-                            phone_number: user.phone_number,
-                            isVerified: user.isVerified,
-                            date: user.date,
-                            dateOfBirth: student.dateOfBirth,
-                            yearOfStudy: student.yearOfStudy,
-                            department: student.department,
-                            nationality: student.nationality,
-                            state: student.state,
-                            lga: student.lga,
-                            address: student.address,
-                            guardian_firstName: student.guardian_firstName,
-                            guardian_lastName: student.guardian_lastName,
-                            guardian_relationship: student.guardian_relationship,
-                            guardian_phoneNumber: student.guardian_phoneNumber,
-                            userID: student.userID,
-                        },
-                        reservations: reservations,
-                    })];
-            case 5:
-                error_1 = _e.sent();
+                return [4, model_1.ReservationModel.find({ userID: user._id })];
+            case 3:
+                reservations = _a.sent();
+                return [2, h.response({ reservations: reservations })];
+            case 4:
+                error_1 = _a.sent();
                 return [2, boom_1.internal(JSON.stringify(error_1))];
-            case 6: return [2];
+            case 5: return [2];
         }
     });
 }); };
-exports.studentDetailsHandler = studentDetailsHandler;
+exports.getCurrentReservation = getCurrentReservation;

@@ -39,59 +39,54 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.userVerificationHandler = exports.userVerificationValidator = void 0;
+exports.forgotPasswordHandler = exports.forgotPasswordRequestValidator = void 0;
 var boom_1 = require("@hapi/boom");
+var bcryptjs_1 = require("bcryptjs");
 var joi_1 = __importDefault(require("joi"));
-var jsonwebtoken_1 = require("jsonwebtoken");
-var config_1 = __importDefault(require("../config"));
-var model_1 = require("../user/model");
-var model_2 = require("./model");
-exports.userVerificationValidator = {
+var auth_1 = require("../auth");
+var middlewares_1 = require("../middlewares");
+exports.forgotPasswordRequestValidator = {
     payload: joi_1.default.object({
-        registrationNumber: joi_1.default.string().required(),
-        verificationCode: joi_1.default.string().required(),
+        old_password: joi_1.default.string().required(),
+        new_password: joi_1.default.string().required(),
     }),
     failAction: function (_r, _h, err) {
-        return boom_1.badRequest("Unsupported format, Error " + err);
+        return boom_1.badRequest("Unsupported format, Error: " + err);
     },
 };
-var userVerificationHandler = function (req, h) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, registrationNumber, verificationCode, user, token, error_1;
+var forgotPasswordHandler = function (req, h) { return __awaiter(void 0, void 0, void 0, function () {
+    var _a, old_password, new_password, validateAuth, user, confirmedPassword, password, error_1;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
                 _b.trys.push([0, 4, , 5]);
-                _a = req.payload, registrationNumber = _a.registrationNumber, verificationCode = _a.verificationCode;
-                return [4, model_2.userModel.findOne({
-                        verificationCode: verificationCode.trim(),
-                        registrationNumber: registrationNumber,
-                    })];
+                _a = req.payload, old_password = _a.old_password, new_password = _a.new_password;
+                return [4, middlewares_1.ValidateUser(req)];
             case 1:
+                validateAuth = _b.sent();
+                if (!validateAuth.isValid) {
+                    return [2, boom_1.notAcceptable(validateAuth.reason)];
+                }
+                return [4, auth_1.userModel.findById(validateAuth.credentials)];
+            case 2:
                 user = _b.sent();
                 if (!user) {
-                    return [2, boom_1.notFound("Student account not found.")];
+                    return [2, boom_1.notFound("Student not found.")];
                 }
-                return [4, model_2.userModel.updateOne({
-                        registrationNumber: registrationNumber,
-                    }, { isVerified: true })];
-            case 2:
-                _b.sent();
-                return [4, new model_1.studentModel({ userID: user._id }).save()];
+                confirmedPassword = bcryptjs_1.compareSync(old_password, user.password);
+                if (!confirmedPassword) {
+                    return [2, boom_1.badData("Incorrect password")];
+                }
+                password = bcryptjs_1.hashSync(new_password, bcryptjs_1.genSaltSync(5));
+                return [4, auth_1.userModel.updateOne({ _id: user._id }, { password: password })];
             case 3:
                 _b.sent();
-                token = jsonwebtoken_1.sign({ id: user._id }, config_1.default.secret, { expiresIn: "30 day" });
-                return [2, h.response({
-                        token: token,
-                        message: user.isVerified
-                            ? "Your account is already verified, you can proceed to use."
-                            : "Your has been created successfully!.",
-                    })];
+                return [2, h.response({ message: "successful" })];
             case 4:
                 error_1 = _b.sent();
-                console.log(error_1);
-                return [2, boom_1.internal(JSON.stringify(error_1))];
+                return [2, boom_1.internal()];
             case 5: return [2];
         }
     });
 }); };
-exports.userVerificationHandler = userVerificationHandler;
+exports.forgotPasswordHandler = forgotPasswordHandler;

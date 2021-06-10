@@ -35,63 +35,41 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.userVerificationHandler = exports.userVerificationValidator = void 0;
+exports.requestForgotPasswordHandler = void 0;
 var boom_1 = require("@hapi/boom");
-var joi_1 = __importDefault(require("joi"));
-var jsonwebtoken_1 = require("jsonwebtoken");
-var config_1 = __importDefault(require("../config"));
-var model_1 = require("../user/model");
-var model_2 = require("./model");
-exports.userVerificationValidator = {
-    payload: joi_1.default.object({
-        registrationNumber: joi_1.default.string().required(),
-        verificationCode: joi_1.default.string().required(),
-    }),
-    failAction: function (_r, _h, err) {
-        return boom_1.badRequest("Unsupported format, Error " + err);
-    },
-};
-var userVerificationHandler = function (req, h) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, registrationNumber, verificationCode, user, token, error_1;
-    return __generator(this, function (_b) {
-        switch (_b.label) {
+var auth_1 = require("../auth");
+var mail_1 = require("../function/mail");
+var middlewares_1 = require("../middlewares");
+var requestForgotPasswordHandler = function (req, h) { return __awaiter(void 0, void 0, void 0, function () {
+    var validateAuth, user, error_1;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
             case 0:
-                _b.trys.push([0, 4, , 5]);
-                _a = req.payload, registrationNumber = _a.registrationNumber, verificationCode = _a.verificationCode;
-                return [4, model_2.userModel.findOne({
-                        verificationCode: verificationCode.trim(),
-                        registrationNumber: registrationNumber,
-                    })];
+                _a.trys.push([0, 3, , 4]);
+                return [4, middlewares_1.ValidateUser(req)];
             case 1:
-                user = _b.sent();
-                if (!user) {
-                    return [2, boom_1.notFound("Student account not found.")];
+                validateAuth = _a.sent();
+                if (!validateAuth.isValid) {
+                    return [2, boom_1.notAcceptable(validateAuth.reason)];
                 }
-                return [4, model_2.userModel.updateOne({
-                        registrationNumber: registrationNumber,
-                    }, { isVerified: true })];
+                return [4, auth_1.userModel.findById(validateAuth.credentials)];
             case 2:
-                _b.sent();
-                return [4, new model_1.studentModel({ userID: user._id }).save()];
+                user = _a.sent();
+                if (!user) {
+                    return [2, boom_1.notFound("Student not found.")];
+                }
+                mail_1.mailTo({
+                    subject: "Forgot Password Request",
+                    mail: user.email,
+                    msg: "follow this link to reset your account password: <a href=\"https://dipromedics.com/forgot_password?registrationNumber=" + user.registrationNumber + "\" target=\"_blank\" rel=\"noopener noreferrer\">https://dipromedics.com/forgot_password?registrationNumber=" + user.registrationNumber + "</a>",
+                });
+                return [2, h.response({ message: "request sent" })];
             case 3:
-                _b.sent();
-                token = jsonwebtoken_1.sign({ id: user._id }, config_1.default.secret, { expiresIn: "30 day" });
-                return [2, h.response({
-                        token: token,
-                        message: user.isVerified
-                            ? "Your account is already verified, you can proceed to use."
-                            : "Your has been created successfully!.",
-                    })];
-            case 4:
-                error_1 = _b.sent();
-                console.log(error_1);
-                return [2, boom_1.internal(JSON.stringify(error_1))];
-            case 5: return [2];
+                error_1 = _a.sent();
+                return [2, boom_1.internal()];
+            case 4: return [2];
         }
     });
 }); };
-exports.userVerificationHandler = userVerificationHandler;
+exports.requestForgotPasswordHandler = requestForgotPasswordHandler;

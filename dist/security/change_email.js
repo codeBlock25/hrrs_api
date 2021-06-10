@@ -35,72 +35,60 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.studentDetailsHandler = void 0;
+exports.changeEmailHandler = exports.changeEmailRequestValidator = void 0;
 var boom_1 = require("@hapi/boom");
+var joi_1 = __importDefault(require("joi"));
 var auth_1 = require("../auth");
 var middlewares_1 = require("../middlewares");
-var reservations_1 = require("../reservations");
-var model_1 = require("./model");
-var studentDetailsHandler = function (req, h) { return __awaiter(void 0, void 0, void 0, function () {
-    var auth, student, reservations, user, error_1;
-    var _a, _b, _c, _d;
-    return __generator(this, function (_e) {
-        switch (_e.label) {
+exports.changeEmailRequestValidator = {
+    payload: joi_1.default.object({
+        old_email: joi_1.default.string().required(),
+        new_email: joi_1.default.string().required(),
+    }),
+    failAction: function (_r, _h, err) {
+        return boom_1.badRequest("Unsupported format, Error: " + err);
+    },
+};
+var changeEmailHandler = function (req, h) { return __awaiter(void 0, void 0, void 0, function () {
+    var _a, old_email, new_email, validateAuth, user, confirmedEmail, error_1;
+    var _b;
+    return __generator(this, function (_c) {
+        switch (_c.label) {
             case 0:
-                _e.trys.push([0, 5, , 6]);
+                _c.trys.push([0, 4, , 5]);
+                _a = req.payload, old_email = _a.old_email, new_email = _a.new_email;
                 return [4, middlewares_1.ValidateUser(req)];
             case 1:
-                auth = _e.sent();
-                if (!auth.isValid) {
-                    return [2, boom_1.badGateway("Failed Credential with Error: " + ((_a = auth.reason) !== null && _a !== void 0 ? _a : "JWT"))];
+                validateAuth = _c.sent();
+                if (!validateAuth.isValid) {
+                    return [2, boom_1.notAcceptable(validateAuth.reason)];
                 }
-                return [4, model_1.studentModel.findOne({
-                        userID: (_b = auth.credentials) !== null && _b !== void 0 ? _b : "",
-                    })];
+                return [4, auth_1.userModel.findById(validateAuth.credentials)];
             case 2:
-                student = _e.sent();
-                return [4, reservations_1.ReservationModel.find({
-                        userID: (_c = auth.credentials) !== null && _c !== void 0 ? _c : "",
-                    })];
-            case 3:
-                reservations = _e.sent();
-                return [4, auth_1.userModel.findOne({ _id: (_d = auth.credentials) !== null && _d !== void 0 ? _d : "" })];
-            case 4:
-                user = _e.sent();
-                if (!user || !student) {
-                    return [2, boom_1.notFound("student not found")];
+                user = _c.sent();
+                if (!user) {
+                    return [2, boom_1.notFound("Student not found.")];
                 }
-                return [2, h.response({
-                        details: {
-                            first_name: user.first_name,
-                            last_name: user.last_name,
-                            email: user.email,
-                            gender: user.gender,
-                            registrationNumber: user.registrationNumber,
-                            phone_number: user.phone_number,
-                            isVerified: user.isVerified,
-                            date: user.date,
-                            dateOfBirth: student.dateOfBirth,
-                            yearOfStudy: student.yearOfStudy,
-                            department: student.department,
-                            nationality: student.nationality,
-                            state: student.state,
-                            lga: student.lga,
-                            address: student.address,
-                            guardian_firstName: student.guardian_firstName,
-                            guardian_lastName: student.guardian_lastName,
-                            guardian_relationship: student.guardian_relationship,
-                            guardian_phoneNumber: student.guardian_phoneNumber,
-                            userID: student.userID,
-                        },
-                        reservations: reservations,
-                    })];
-            case 5:
-                error_1 = _e.sent();
+                confirmedEmail = old_email.trim() === user.email;
+                if (!confirmedEmail) {
+                    return [2, boom_1.badData("Incorrect email")];
+                }
+                return [4, auth_1.userModel.updateOne({ _id: user._id }, { email: new_email })];
+            case 3:
+                _c.sent();
+                return [2, h.response({ message: "successful" })];
+            case 4:
+                error_1 = _c.sent();
+                if ((_b = error_1 === null || error_1 === void 0 ? void 0 : error_1.keyPattern) === null || _b === void 0 ? void 0 : _b.email) {
+                    return [2, boom_1.conflict("This email is already tired to another account.")];
+                }
                 return [2, boom_1.internal(JSON.stringify(error_1))];
-            case 6: return [2];
+            case 5: return [2];
         }
     });
 }); };
-exports.studentDetailsHandler = studentDetailsHandler;
+exports.changeEmailHandler = changeEmailHandler;

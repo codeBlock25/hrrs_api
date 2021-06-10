@@ -15,7 +15,7 @@ var reservationSchema = new mongoose_1.Schema({
         required: true,
     },
     floor: {
-        type: Number,
+        type: String,
         required: true,
     },
     room_name: {
@@ -28,8 +28,6 @@ var reservationSchema = new mongoose_1.Schema({
     },
     userID: {
         type: mongoose_1.Schema.Types.ObjectId,
-        required: true,
-        ref: "user",
     },
     date: {
         type: Date,

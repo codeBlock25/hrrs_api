@@ -7,6 +7,23 @@ import {
   userVerificationHandler,
   userVerificationValidator,
 } from "./auth";
+import {
+  contactRequestHandler,
+  contactRequestValidator,
+} from "./contact/contact";
+import {
+  createReservationsHandler,
+  createReservationsRequestValidator,
+} from "./reservations/create";
+import { getCurrentReservation } from "./reservations/current";
+import {
+  changeEmailHandler,
+  changeEmailRequestValidator,
+  changePasswordHandler,
+  changePasswordRequestValidator,
+  requestForgotPasswordHandler,
+} from "./security";
+import { studentDetailsHandler } from "./user";
 
 const authRoute: ServerRoute[] = [
   {
@@ -35,6 +52,65 @@ const authRoute: ServerRoute[] = [
   },
 ];
 
+const userRoute: ServerRoute[] = [
+  {
+    method: "GET",
+    path: "/api/student/me",
+    handler: studentDetailsHandler,
+  },
+];
+
+const contactRoute: ServerRoute[] = [
+  {
+    method: "PUT",
+    path: "/api/contact/message",
+    handler: contactRequestHandler,
+    options: {
+      validate: contactRequestValidator,
+    },
+  },
+];
+
+const securityRoute: ServerRoute[] = [
+  {
+    method: "PUT",
+    path: "/api/security/change-email",
+    handler: changeEmailHandler,
+    options: {
+      validate: changeEmailRequestValidator,
+    },
+  },
+  {
+    method: "PUT",
+    path: "/api/security/change-password",
+    handler: changePasswordHandler,
+    options: {
+      validate: changePasswordRequestValidator,
+    },
+  },
+  {
+    method: "GET",
+    path: "/api/security/forgot-password",
+    handler: requestForgotPasswordHandler,
+  },
+];
+
+const reservationRoute: ServerRoute[] = [
+  {
+    method: "POST",
+    path: "/api/reservation/create",
+    handler: createReservationsHandler,
+    options: {
+      validate: createReservationsRequestValidator,
+    },
+  },
+  {
+    method: "GET",
+    path: "/api/reservation/mine",
+    handler: getCurrentReservation,
+  },
+];
+
 const AppRoute: ServerRoute[] = [
   {
     method: "GET",
@@ -44,6 +120,10 @@ const AppRoute: ServerRoute[] = [
     },
   },
   ...authRoute,
+  ...userRoute,
+  ...contactRoute,
+  ...securityRoute,
+  ...reservationRoute,
 ];
 
 export default AppRoute;

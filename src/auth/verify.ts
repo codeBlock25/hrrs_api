@@ -52,6 +52,7 @@ export const userVerificationHandler = async (
         : "Your has been created successfully!.",
     });
   } catch (error) {
+    console.log(error);
     return internal(JSON.stringify(error));
   }
 };

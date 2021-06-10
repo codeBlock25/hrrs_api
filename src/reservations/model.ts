@@ -8,11 +8,10 @@ export enum BedSpaceType {
   secD,
 }
 export interface ReservationType extends Document {
-  hotel_name: string;
+  hostel_name: string;
   floor: number;
   room_name: string;
   bed_space: BedSpaceType;
-  user: UserType;
   userID: string;
   date: Date;
 }
@@ -23,7 +22,7 @@ const reservationSchema = new Schema({
     required: true,
   },
   floor: {
-    type: Number,
+    type: String,
     required: true,
   },
   room_name: {
@@ -36,8 +35,6 @@ const reservationSchema = new Schema({
   },
   userID: {
     type: Schema.Types.ObjectId,
-    required: true,
-    ref: "user",
   },
   date: {
     type: Date,

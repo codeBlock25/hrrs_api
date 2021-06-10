@@ -25,56 +25,47 @@ const studentSchema = new Schema({
     type: Schema.Types.ObjectId,
     required: true,
     unique: true,
+    ref: "user",
   },
   yearOfStudy: {
     type: String,
     default: "",
-    required: true,
   },
   department: {
     type: String,
     default: "",
-    required: true,
   },
   nationality: {
     type: String,
     default: "",
-    required: true,
   },
   state: {
     type: String,
     default: "",
-    required: true,
   },
   lga: {
     type: String,
     default: "",
-    required: true,
   },
   address: {
     type: String,
     default: "",
-    required: true,
   },
   guardian_firstName: {
     type: String,
     default: "",
-    required: true,
   },
   guardian_lastName: {
     type: String,
     default: "",
-    required: true,
   },
   guardian_relationship: {
     type: String,
     default: "",
-    required: true,
   },
   guardian_phoneNumber: {
     type: String,
     default: "",
-    required: true,
   },
 });
 
