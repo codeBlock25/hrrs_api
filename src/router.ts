@@ -14,8 +14,12 @@ import {
 import {
   createReservationsHandler,
   createReservationsRequestValidator,
-} from "./reservations/create";
-import { getCurrentReservation } from "./reservations/current";
+  getAvailableRequestValidator,
+  getAvailableReservations,
+  getCurrentReservation,
+  reservationRequestHandler,
+  reservationRequestValidator,
+} from "./reservations";
 import {
   changeEmailHandler,
   changeEmailRequestValidator,
@@ -108,6 +112,22 @@ const reservationRoute: ServerRoute[] = [
     method: "GET",
     path: "/api/reservation/mine",
     handler: getCurrentReservation,
+  },
+  {
+    method: "GET",
+    path: "/api/reservation/available",
+    handler: getAvailableReservations,
+    options: {
+      validate: getAvailableRequestValidator,
+    },
+  },
+  {
+    method: "POST",
+    path: "/api/reservation/reserve",
+    handler: reservationRequestHandler,
+    options: {
+      validate: reservationRequestValidator,
+    },
   },
 ];
 

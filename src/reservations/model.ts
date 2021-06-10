@@ -1,5 +1,4 @@
 import { Schema, Document, model } from "mongoose";
-import { UserType } from "../auth";
 
 export enum BedSpaceType {
   secA,
@@ -9,7 +8,7 @@ export enum BedSpaceType {
 }
 export interface ReservationType extends Document {
   hostel_name: string;
-  floor: number;
+  floor: string;
   room_name: string;
   bed_space: BedSpaceType;
   userID: string;

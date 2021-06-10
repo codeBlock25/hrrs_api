@@ -7,8 +7,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var auth_1 = require("./auth");
 var contact_1 = require("./contact/contact");
-var create_1 = require("./reservations/create");
-var current_1 = require("./reservations/current");
+var reservations_1 = require("./reservations");
 var security_1 = require("./security");
 var user_1 = require("./user");
 var authRoute = [
@@ -81,15 +80,31 @@ var reservationRoute = [
     {
         method: "POST",
         path: "/api/reservation/create",
-        handler: create_1.createReservationsHandler,
+        handler: reservations_1.createReservationsHandler,
         options: {
-            validate: create_1.createReservationsRequestValidator,
+            validate: reservations_1.createReservationsRequestValidator,
         },
     },
     {
         method: "GET",
         path: "/api/reservation/mine",
-        handler: current_1.getCurrentReservation,
+        handler: reservations_1.getCurrentReservation,
+    },
+    {
+        method: "GET",
+        path: "/api/reservation/available",
+        handler: reservations_1.getAvailableReservations,
+        options: {
+            validate: reservations_1.getAvailableRequestValidator,
+        },
+    },
+    {
+        method: "POST",
+        path: "/api/reservation/reserve",
+        handler: reservations_1.reservationRequestHandler,
+        options: {
+            validate: reservations_1.reservationRequestValidator,
+        },
     },
 ];
 var AppRoute = __spreadArray(__spreadArray(__spreadArray(__spreadArray(__spreadArray([

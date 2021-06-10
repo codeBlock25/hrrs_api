@@ -8,8 +8,8 @@ import { ReservationModel, ReservationType } from "./";
 
 export const reservationRequestValidator: RouteOptionsValidate = {
   payload: Joi.object({
-    hotel_name: Joi.string().required(),
-    floor: Joi.number().required(),
+    hostel_name: Joi.string().required(),
+    floor: Joi.string().required(),
     room_name: Joi.string().required(),
     bed_space: Joi.number().min(0).max(3).required(),
   }),
@@ -23,7 +23,7 @@ export const reservationRequestHandler = async (
   h: ResponseToolkit
 ) => {
   try {
-    const { hotel_name, floor, room_name, bed_space } =
+    const { hostel_name, floor, room_name, bed_space } =
       req.payload as ReservationType;
 
     const validateAuth = await ValidateUser(req);
@@ -34,17 +34,21 @@ export const reservationRequestHandler = async (
     if (!user) {
       return notFound("Student not found.");
     }
-    let reservation = await new ReservationModel({
-      hotel_name,
-      floor,
-      room_name,
-      bed_space,
-      userID: user._id,
-    }).save();
+    let reservation = await ReservationModel.updateOne(
+      {
+        hostel_name,
+        floor,
+        room_name,
+        bed_space,
+      },
+      {
+        userID: user._id,
+      }
+    );
     mailTo({
       subject: "Reservation successful",
       mail: user.email,
-      msg: `you have reserved a spot at room ${room_name} at ${hotel_name} hotel`,
+      msg: `you have reserved a spot at room ${room_name} at ${hostel_name} hotel`,
     });
     return h.response({
       reservation,

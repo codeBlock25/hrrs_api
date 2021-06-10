@@ -39,67 +39,63 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.reservationRequestHandler = exports.reservationRequestValidator = void 0;
+exports.getAvailableReservations = exports.getAvailableRequestValidator = void 0;
 var boom_1 = require("@hapi/boom");
 var joi_1 = __importDefault(require("joi"));
-var mail_1 = require("../function/mail");
-var middlewares_1 = require("../middlewares");
-var auth_1 = require("../auth");
-var _1 = require("./");
-exports.reservationRequestValidator = {
-    payload: joi_1.default.object({
+var lodash_1 = require("lodash");
+var model_1 = require("./model");
+exports.getAvailableRequestValidator = {
+    query: joi_1.default.object({
         hostel_name: joi_1.default.string().required(),
-        floor: joi_1.default.string().required(),
-        room_name: joi_1.default.string().required(),
-        bed_space: joi_1.default.number().min(0).max(3).required(),
     }),
-    failAction: function (_r, _h, err) {
-        return boom_1.badRequest("Unsupported format, Error: " + err);
+    failAction: function (_r, _h, error) {
+        return boom_1.badRequest("Unsupported format, Error: " + error);
     },
 };
-var reservationRequestHandler = function (req, h) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, hostel_name, floor, room_name, bed_space, validateAuth, user, reservation, error_1;
-    return __generator(this, function (_b) {
-        switch (_b.label) {
+var getAvailableReservations = function (req, h) { return __awaiter(void 0, void 0, void 0, function () {
+    var hostel_name, reservations, _reservations_1, error_1;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
             case 0:
-                _b.trys.push([0, 4, , 5]);
-                _a = req.payload, hostel_name = _a.hostel_name, floor = _a.floor, room_name = _a.room_name, bed_space = _a.bed_space;
-                return [4, middlewares_1.ValidateUser(req)];
-            case 1:
-                validateAuth = _b.sent();
-                if (!validateAuth.isValid) {
-                    return [2, boom_1.notAcceptable(validateAuth.reason)];
-                }
-                return [4, auth_1.userModel.findById(validateAuth.credentials)];
-            case 2:
-                user = _b.sent();
-                if (!user) {
-                    return [2, boom_1.notFound("Student not found.")];
-                }
-                return [4, _1.ReservationModel.updateOne({
+                _a.trys.push([0, 2, , 3]);
+                hostel_name = req.query.hostel_name;
+                return [4, model_1.ReservationModel.find({
                         hostel_name: hostel_name,
-                        floor: floor,
-                        room_name: room_name,
-                        bed_space: bed_space,
-                    }, {
-                        userID: user._id,
+                        userID: { $exists: false },
                     })];
-            case 3:
-                reservation = _b.sent();
-                mail_1.mailTo({
-                    subject: "Reservation successful",
-                    mail: user.email,
-                    msg: "you have reserved a spot at room " + room_name + " at " + hostel_name + " hotel",
+            case 1:
+                reservations = _a.sent();
+                _reservations_1 = [];
+                reservations.map(function (reservation) {
+                    var currentReservation = lodash_1.find(_reservations_1, {
+                        floor: reservation.floor,
+                    });
+                    if (!currentReservation) {
+                        _reservations_1.push({ floor: reservation.floor, rooms: [] });
+                        currentReservation = { floor: reservation.floor, rooms: [] };
+                    }
+                    var currentReservationByRoom = lodash_1.find(currentReservation.rooms, {
+                        name: reservation.room_name,
+                    });
+                    if (!currentReservationByRoom) {
+                        currentReservation.rooms.push({
+                            name: reservation.room_name,
+                            bed_space: [],
+                        });
+                        currentReservationByRoom = {
+                            name: reservation.room_name,
+                            bed_space: [],
+                        };
+                    }
+                    currentReservationByRoom.bed_space.push(reservation.bed_space);
                 });
-                return [2, h.response({
-                        reservation: reservation,
-                        message: "Reservation successful",
-                    })];
-            case 4:
-                error_1 = _b.sent();
+                return [2, h.response({ reservations: _reservations_1 })];
+            case 2:
+                error_1 = _a.sent();
+                console.log({ error: error_1 });
                 return [2, boom_1.internal(JSON.stringify(error_1))];
-            case 5: return [2];
+            case 3: return [2];
         }
     });
 }); };
-exports.reservationRequestHandler = reservationRequestHandler;
+exports.getAvailableReservations = getAvailableReservations;
