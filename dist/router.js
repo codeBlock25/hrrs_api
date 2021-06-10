@@ -6,6 +6,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var auth_1 = require("./auth");
+var forgot_password_1 = require("./auth/forgot-password");
 var contact_1 = require("./contact/contact");
 var reservations_1 = require("./reservations");
 var security_1 = require("./security");
@@ -17,6 +18,14 @@ var authRoute = [
         handler: auth_1.userRegistrationHandler,
         options: {
             validate: auth_1.userRegistrationValidator,
+        },
+    },
+    {
+        method: "PUT",
+        path: "/api/auth/forgot-password",
+        handler: forgot_password_1.forgotPasswordHandler,
+        options: {
+            validate: forgot_password_1.forgotPasswordRequestValidator,
         },
     },
     {

@@ -8,6 +8,10 @@ import {
   userVerificationValidator,
 } from "./auth";
 import {
+  forgotPasswordHandler,
+  forgotPasswordRequestValidator,
+} from "./auth/forgot-password";
+import {
   contactRequestHandler,
   contactRequestValidator,
 } from "./contact/contact";
@@ -20,7 +24,7 @@ import {
   reservationRequestHandler,
   reservationRequestValidator,
 } from "./reservations";
-import { createMultipleReservationsHandler } from "./reservations/createmutiple";
+// import { createMultipleReservationsHandler } from "./reservations/createmutiple";
 import {
   changeEmailHandler,
   changeEmailRequestValidator,
@@ -37,6 +41,14 @@ const authRoute: ServerRoute[] = [
     handler: userRegistrationHandler,
     options: {
       validate: userRegistrationValidator,
+    },
+  },
+  {
+    method: "PUT",
+    path: "/api/auth/forgot-password",
+    handler: forgotPasswordHandler,
+    options: {
+      validate: forgotPasswordRequestValidator,
     },
   },
   {
